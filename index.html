@@ -1,0 +1,113 @@
+<!doctype html> 
+<html lang="en"> 
+<head> 
+    <meta charset="UTF-8" />
+    <title>Making your first Phaser 3 Game - Part 1</title>
+    <script src="//cdn.jsdelivr.net/npm/phaser@3.55.2/dist/phaser.js"></script>
+</head>
+<body>
+
+<script type="text/javascript">
+
+class Dude extends Phaser.Physics.Arcade.Sprite {
+
+    constructor(config) {
+        super(config.scene, config.x, config.y, 'dude');
+
+        this.setScale(config.scale, config.scale); //BIG!
+        config.scene.add.existing(this); //add this object to the scene
+        this.setInteractive(); //clickable
+        this.on('pointerdown', this.clicked, this);
+        
+        this.state = 0
+
+        //need this to set a timer
+        this.scene = config.scene;
+    }
+
+    dudeCollide(other_dude) {
+        if (other_dude.state == 1 && this.state == 0) {
+            this.infectMe();
+        }
+    }
+
+    infectMe() {
+        this.state = 1;
+        this.setFrame(this.state);
+        
+        this.scene.time.addEvent( {
+            delay: 2000,
+            callback: () => 
+            {
+                this.state = 2;
+                this.setFrame(this.state);
+            },
+        } );
+    }   
+    
+    clicked() {
+        this.infectMe();
+    }
+}
+
+var config = {
+    type: Phaser.AUTO,
+    width: 800,
+    height: 600,
+    parent: 'phaser-example',
+    physics: {
+        default: 'arcade',
+        arcade: {
+            debug: false,
+            gravity: { y: 0 }
+        }
+    },
+    scene: {
+        preload: preload,
+        create: create
+    }
+};
+
+var game = new Phaser.Game(config);
+
+function preload ()
+{
+    this.load.spritesheet('dude', 'assets/SIR_sprites.png', { frameWidth: 67, frameHeight: 125 });
+}
+
+function create ()
+{
+    var bounds = new Phaser.Geom.Rectangle(200, 150, 400, 300);
+
+    var group = this.physics.add.group();
+    for (let i=0; i<50; i++) {
+        let duder = new Dude({scene: this, scale: 0.18});
+        group.add(duder);
+    }
+
+    group.getChildren().forEach( (dudes) => {
+        dudes.body.setBoundsRectangle(bounds);
+        dudes.setBounce(1,1);
+        dudes.setCollideWorldBounds(true);
+        dudes.setMaxVelocity(50,50);
+        dudes.setVelocity(Phaser.Math.Between(-50,50), Phaser.Math.Between(-50,50));
+    });
+    
+    Phaser.Actions.RandomRectangle(group.getChildren(), bounds);
+    
+    this.physics.add.collider(group, group, (o1, o2) => {
+        o1.dudeCollide(o2);
+        o2.dudeCollide(o1);
+    });
+
+    this.add.graphics()
+        .lineStyle(5, 0x00ffff, 0.5)
+        .strokeRectShape(bounds);
+        
+}
+
+
+</script>
+
+</body>
+</html>
