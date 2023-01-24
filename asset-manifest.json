@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/InfectiousPhase/static/css/main.9071bff3.css",
+    "main.js": "/InfectiousPhase/static/js/main.7b04bc00.js",
+    "index.html": "/InfectiousPhase/index.html",
+    "main.9071bff3.css.map": "/InfectiousPhase/static/css/main.9071bff3.css.map",
+    "main.7b04bc00.js.map": "/InfectiousPhase/static/js/main.7b04bc00.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.9071bff3.css",
+    "static/js/main.7b04bc00.js"
+  ]
+}
