@@ -69,7 +69,7 @@ class SIRScene extends Phaser.Scene {
 
         var group = this.physics.add.group();
 
-        for (let i=0; i<500; i++) {
+        for (let i=0; i<300; i++) {
             let duder = new SIRAgent({scene: this, scale: 0.1});
             group.add(duder);
 
