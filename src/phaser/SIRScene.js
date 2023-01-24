@@ -1,6 +1,14 @@
 import Phaser from "phaser";
-import { Provider } from 'react-redux';
 import { store } from '../app/store';
+import {
+    add_susceptible, 
+    remove_susceptible, 
+    add_infected, 
+    remove_infected, 
+    add_recovered, 
+    remove_recovered
+  } from '../features/compartmentCounts/counterSlice'
+
 
 class SIRAgent extends Phaser.Physics.Arcade.Sprite {
     constructor(config) {
@@ -18,7 +26,7 @@ class SIRAgent extends Phaser.Physics.Arcade.Sprite {
     }
 
     dudeCollide(other_dude) {
-        if (other_dude.state == 1 && this.state == 0) {
+        if (other_dude.state === 1 && this.state === 0) {
             this.infectMe();
         }
     }
@@ -26,6 +34,8 @@ class SIRAgent extends Phaser.Physics.Arcade.Sprite {
     infectMe() {
         this.state = 1;
         this.setFrame(this.state);
+        store.dispatch(remove_susceptible());
+        store.dispatch(add_infected())
         
         this.scene.time.addEvent( {
             delay: 2000,
@@ -33,6 +43,10 @@ class SIRAgent extends Phaser.Physics.Arcade.Sprite {
             {
                 this.state = 2;
                 this.setFrame(this.state);
+
+                store.dispatch(remove_infected());
+                store.dispatch(add_recovered());
+
             },
         } );
     }   
@@ -55,17 +69,19 @@ class SIRScene extends Phaser.Scene {
 
         var group = this.physics.add.group();
 
-        for (let i=0; i<50; i++) {
-            let duder = new SIRAgent({scene: this, scale: 0.18});
+        for (let i=0; i<500; i++) {
+            let duder = new SIRAgent({scene: this, scale: 0.1});
             group.add(duder);
+
+            store.dispatch(add_susceptible());
         };
 
         group.getChildren().forEach( (dudes) => {
             dudes.body.setBoundsRectangle(bounds);
             dudes.setBounce(1,1);
             dudes.setCollideWorldBounds(true);
-            dudes.setMaxVelocity(50,50);
-            dudes.setVelocity(Phaser.Math.Between(-50,50), Phaser.Math.Between(-50,50));
+            dudes.setMaxVelocity(10,10);
+            dudes.setVelocity(Phaser.Math.Between(-80,80), Phaser.Math.Between(-80,80));
         });
         
         Phaser.Actions.RandomRectangle(group.getChildren(), bounds);
