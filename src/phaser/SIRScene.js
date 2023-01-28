@@ -60,6 +60,9 @@ class SIRAgent extends Phaser.Physics.Arcade.Sprite {
     }
 };
 
+
+
+
 /*
 Scene would have to handle collisions (callback in agents?)
 Scene sets up world structure as well (subpopulations? migration?)
@@ -72,10 +75,10 @@ class AgentLocation extends Phaser.Physics.Arcade.Group {
                 collideWorldBounds: true,
                 bounceX: 1,
                 bounceY: 1,
-                maxVelocityX: 10,
-                maxVelocityY: 10,
-                velocityX: 10,
-                velocityY: 10
+                maxVelocityX: config.max_velocity,
+                maxVelocityY: config.max_velocity,
+                velocityX: config.max_velocity,
+                velocityY: config.max_velocity
         });
 
         this.scene = config.scene;
@@ -88,7 +91,7 @@ class AgentLocation extends Phaser.Physics.Arcade.Group {
         config.scene.add.existing(g);
 
 
-        for (let i=0; i<300; i++) {
+        for (let i=0; i<config.num_agents; i++) {
             let duder = new SIRAgent({scene: this.scene, scale: 0.1});
             this.add(duder, true);
             store.dispatch(add_susceptible());
@@ -112,6 +115,10 @@ class AgentLocation extends Phaser.Physics.Arcade.Group {
     }
 }
 
+
+
+
+
 class SIRScene extends Phaser.Scene {
     constructor() {
       super("PlayGame");
@@ -122,14 +129,32 @@ class SIRScene extends Phaser.Scene {
     }
 
     create() {
-        var bounds = new AgentLocation({world: this.physics.world, scene: this, x: 200, y: 150, width: 400, height: 300});
-/*
-        this.add.graphics()
-            .lineStyle(5, 0x00ffff, 0.5)
-            .strokeRectShape(bounds.bounds_rectangle);
-*/
+        var location1 = new AgentLocation({
+            world: this.physics.world, 
+            scene: this, 
+            x: 20, 
+            y: 20, 
+            width: 300, 
+            height: 300,
+            max_velocity: 7.5,
+            num_agents: 200
+        });
+
+        var location2 = new AgentLocation({
+            world: this.physics.world, 
+            scene: this, 
+            x: 420, 
+            y: 20, 
+            width: 300, 
+            height: 300,
+            max_velocity: 15,
+            num_agents: 200
+        });
      };
 };
+
+
+
 
 /* 
     The react component that actually has the game object 
